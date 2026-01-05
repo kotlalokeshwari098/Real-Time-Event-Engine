@@ -3,17 +3,19 @@ package org.example.producer;
 import org.example.domain.Event;
 import org.example.domain.EventState;
 import org.example.domain.EventType;
+import org.example.queue.EventsQueue;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+//multiple concurrent producers generating events safely
 public class Producer{
     public static void main(String[] args) throws InterruptedException {
-        List<Event> events = Collections.synchronizedList(new ArrayList<>());
-        int N=5;
+
+        //storing all events from all producers
+//        List<Event> events = Collections.synchronizedList(new ArrayList<>());
+        EventsQueue events=new EventsQueue();
+        int N=5; //number of producers
         // List<Event> events=new ArrayList<>();
         // Runnable logic: produces 5 events when executed by a thread
         Runnable logic= new Runnable() {
@@ -27,12 +29,18 @@ public class Producer{
                             .eventtype(EventType.ACTION)
                             .build();
                     // Add event to a thread-safe list to avoid race conditions
-                    events.add(e);
+                    try {
+                        events.publish(e);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    //critical section
                 }
             }
         };
 
        // Create N threads, each executing the same Runnable logic
+        // stores thread objects
        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < N; i++) {
             Thread t=new Thread(logic);
@@ -48,10 +56,7 @@ public class Producer{
         }
 
         // Print total number of events and their IDs
-        System.out.println(events.size());
-        events.forEach(event ->{
-            System.out.println(event.getId());
-        });
+
 
     }
 }
