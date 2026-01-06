@@ -11,9 +11,6 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
 
         EventsQueue sharedQueue=new EventsQueue(100, BackpressurePolicy.BLOCK,10000);
-
-        Producer producer=new Producer(sharedQueue);
-        producer.produce();
         ConsumerEventWorker worker=new ConsumerEventWorker(sharedQueue);
         Thread workerThread=new Thread(()->{
             try{
@@ -23,6 +20,10 @@ public class Main {
             }
         });
         workerThread.start();
+        Producer producer=new Producer(sharedQueue);
+        producer.produce();
+
+
 
     }
 }

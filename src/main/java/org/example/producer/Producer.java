@@ -53,10 +53,10 @@ public class Producer{
         }
 
         // Wait for all threads to finish before main thread continues
-        for (Thread t : threads) {
-        // System.out.println(t);
-            t.join();
-        }
+//        for (Thread t : threads) {
+//        // System.out.println(t);
+//            t.join();
+//        }
 
     }
 }
