@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.producer.Producer;
+import org.example.queue.BackpressurePolicy;
 import org.example.queue.EventsQueue;
 import org.example.worker.ConsumerEventWorker;
 
@@ -9,7 +10,7 @@ import org.example.worker.ConsumerEventWorker;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
 
-        EventsQueue sharedQueue=new EventsQueue();
+        EventsQueue sharedQueue=new EventsQueue(100, BackpressurePolicy.BLOCK,10000);
 
         Producer producer=new Producer(sharedQueue);
         producer.produce();

@@ -9,23 +9,44 @@ import java.util.List;
 
 //responsible for safely coordinating multiple producer and consumer
 public class EventsQueue {
-    private final int maxCapacity=100;
+    private int maxCapacity;
+    private BackpressurePolicy  backpressurePolicy;
+    private  long timeoutMs;
+
+
     private final List<Event> events=new LinkedList<>();
+
+    public EventsQueue(int i, BackpressurePolicy backpressurePolicy,long timeoutMs) {
+        this.maxCapacity=i;
+        this.backpressurePolicy=backpressurePolicy;
+        this.timeoutMs=timeoutMs;
+    }
 
     public synchronized void publish(Event event) throws InterruptedException {
         System.out.println(event.getState() +"️"+event.getId());
-        while(events.size() >= maxCapacity){
-                wait();
-//            System.out.println(event.getState() +""+event.getId());
-        }
 
-//        System.out.println(event.getState() +" "+event.getId());
+        while(events.size()>=100){
+            switch(backpressurePolicy){
+                case BLOCK:
+                    wait();
+                    break;
+                case DROP:
+                    return;
+                case TIMEOUT:
+                    long startTime = System.currentTimeMillis();
+                    wait(timeoutMs);
+
+                    long waitedTime = System.currentTimeMillis() - startTime;
+
+                    if (waitedTime >= timeoutMs && events.size() >= maxCapacity) {
+                        // timeout happened, no space freed
+                        return;
+                    }
+            }
+
+        }
         events.add(event);
         notifyAll();
-        System.out.println(event.getState() +""+event.getId());
-        System.out.println(events.size());
-
-
     }
 
     //remove event from queue
