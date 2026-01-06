@@ -10,11 +10,14 @@ import java.util.*;
 
 //multiple concurrent producers generating events safely
 public class Producer{
-    public static void main(String[] args) throws InterruptedException {
-
-        //storing all events from all producers
+    EventsQueue sharedQueue;
+    //storing all events from all producers
 //        List<Event> events = Collections.synchronizedList(new ArrayList<>());
-        EventsQueue events=new EventsQueue();
+    public Producer(EventsQueue sharedQueue){
+        this.sharedQueue=sharedQueue;
+    }
+
+    public void produce() throws InterruptedException {
         int N=5; //number of producers
         // List<Event> events=new ArrayList<>();
         // Runnable logic: produces 5 events when executed by a thread
@@ -30,7 +33,7 @@ public class Producer{
                             .build();
                     // Add event to a thread-safe list to avoid race conditions
                     try {
-                        events.publish(e);
+                        sharedQueue.publish(e);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -54,9 +57,6 @@ public class Producer{
         // System.out.println(t);
             t.join();
         }
-
-        // Print total number of events and their IDs
-
 
     }
 }

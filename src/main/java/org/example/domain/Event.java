@@ -9,7 +9,7 @@ public class Event{
     private final UUID eventId;
     private final LocalDateTime timestamp;
     private final EventType type;
-    private EventState state;
+    private final EventState state;
 
     //business logic,persistence
     private final Map<String,String> payload;
@@ -52,9 +52,6 @@ public class Event{
         return eventId;
     }
 
-    public void setState(EventState queued) {
-        this.state=queued;
-    }
 
     public static class Builder{
         private UUID eventId;
