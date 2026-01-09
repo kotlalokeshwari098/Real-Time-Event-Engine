@@ -9,7 +9,7 @@ public class Event{
     private final UUID eventId;
     private final LocalDateTime timestamp;
     private final EventType type;
-    private final EventState state;
+    private EventState state;
 
     //business logic,persistence
     private final Map<String,String> payload;
@@ -33,6 +33,10 @@ public class Event{
 
     public Map<String, String> getPayload() {
         return payload;
+    }
+
+    public void setState(EventState state){
+        this.state=state;
     }
 
 

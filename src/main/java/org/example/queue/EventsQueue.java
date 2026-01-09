@@ -25,12 +25,14 @@ public class EventsQueue {
     public synchronized void publish(Event event) throws InterruptedException {
         System.out.println(event.getState() +"️"+event.getId());
 
-        while(events.size()>=100){
+        while(events.size()>=maxCapacity){
             switch(backpressurePolicy){
                 case BLOCK:
                     wait();
+                    event.setState(EventState.WAITING);
                     break;
                 case DROP:
+                    event.setState(EventState.FAILED);
                     return;
                 case TIMEOUT:
                     long startTime = System.currentTimeMillis();
@@ -46,6 +48,7 @@ public class EventsQueue {
 
         }
         events.add(event);
+        event.setState(EventState.QUEUED);
         notifyAll();
     }
 

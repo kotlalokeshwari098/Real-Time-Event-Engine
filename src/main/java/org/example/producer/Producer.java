@@ -33,6 +33,7 @@ public class Producer{
                             .build();
                     // Add event to a thread-safe list to avoid race conditions
                     try {
+                        e.setState(EventState.WAITING);
                         sharedQueue.publish(e);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
